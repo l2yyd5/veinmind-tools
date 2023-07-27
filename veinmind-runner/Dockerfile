@@ -1,4 +1,4 @@
-FROM veinmind/go1.18:1.9.21-bullseye as builder
+FROM veinmind/go1.18:1.9.42-bullseye as builder
 WORKDIR /build
 COPY . .
 ARG TARGETARCH
@@ -19,8 +19,9 @@ FROM veinmind/veinmind-vuln:latest as vuln
 FROM veinmind/veinmind-escape:latest as escape
 FROM veinmind/veinmind-privilege-escalation:latest as privilege-escalation
 FROM veinmind/veinmind-minio:latest as minio
+FROM veinmind/veinmind-trace:latest as trace
 
-FROM veinmind/python3.6:1.9.21-bullseye as release
+FROM veinmind/python3.6:1.9.42-bullseye as release
 WORKDIR /tool
 
 COPY dockerfiles/sources.list /etc/apt/sources.list
@@ -34,7 +35,7 @@ COPY --from=weakpass /tool/veinmind-weakpass ./plugin/
 COPY --from=malicious /tool/veinmind-malicious ./plugin/
 COPY --from=sensitive /tool/veinmind-sensitive ./plugin/
 COPY --from=history /tool /tool/plugin/veinmind-history
-COPY --from=backdoor /tool /tool/plugin/veinmind-backdoor
+COPY --from=backdoor /tool /tool/veinmind-backdoor
 COPY --from=log4j2 /tool/veinmind-log4j2  ./plugin/
 COPY --from=unsafe-mount /tool/veinmind-unsafe-mount ./plugin
 COPY --from=iac /tool/veinmind-iac ./plugin
@@ -42,8 +43,9 @@ COPY --from=vuln /tool/veinmind-vuln ./plugin
 COPY --from=escape /tool/veinmind-escape ./plugin
 COPY --from=privilege-escalation /tool/veinmind-privilege-escalation ./plugin
 COPY --from=minio /tool/veinmind-minio ./plugin
+COPY --from=trace /tool/veinmind-trace ./plugin
 
-RUN pip install -r plugin/veinmind-history/requirements.txt && pip install -r plugin/veinmind-backdoor/requirements.txt && chmod +x plugin/*/scan.py
+RUN pip install -r plugin/veinmind-history/requirements.txt && chmod +x plugin/*/scan.py
 RUN echo "#!/bin/bash\n\n./veinmind-runner \$*" > /tool/entrypoint.sh && chmod +x /tool/entrypoint.sh && chmod +x /tool/veinmind-runner
 ENTRYPOINT ["/tool/entrypoint.sh"]
 

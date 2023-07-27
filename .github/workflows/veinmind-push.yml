@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         plugin: [
-          veinmind-backdoor,
           veinmind-history
         ]
         path: [ ./plugins/python/ ]
@@ -46,6 +45,7 @@ jobs:
       fail-fast: false
       matrix:
         plugin: [
+          veinmind-backdoor,
           veinmind-basic,
           veinmind-escape,
           veinmind-privilege-escalation,
@@ -58,6 +58,7 @@ jobs:
           veinmind-weakpass,
           veinmind-webshell,
           veinmind-minio,
+          veinmind-trace
         ]
         path: [ ./plugins/go/ ]
     name: ${{ matrix.plugin }}
